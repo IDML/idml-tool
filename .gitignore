@@ -1,0 +1,6 @@
+.DS_Store
+.idea
+dependency-reduced-pom.xml
+*.iml
+target/
+scalastyle-output.xml

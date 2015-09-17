@@ -2,6 +2,9 @@
 
 A unix-style command line utility for transforming JSON
 
+## Building
+`sbt assembly` will build a shaded jar
+
 ## Usage
 
 ```

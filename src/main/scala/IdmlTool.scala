@@ -14,7 +14,7 @@ object IdmlTool {
     help("help") text ("Show usage information and flags")
     opt[Boolean]("pretty") action { (x, c) =>
       c.copy(pretty = x)
-    } text("Enable pretty printing of output")
+    } text ("Enable pretty printing of output")
     arg[File]("<file>...") unbounded() required() action { (x, c) =>
       c.copy(files = c.files :+ x)
     } text ("one or more mapping files to run the data through")
@@ -33,24 +33,24 @@ object IdmlTool {
     val (found, missing) = config.files.partition(_.exists())
     missing.isEmpty match {
       case false =>
-        missing.foreach{f => println("Couldn't load mapping from %s".format(f))}
+        missing.foreach { f => println("Couldn't load mapping from %s".format(f)) }
         sys.exit(1)
       case true =>
-        val chain = ptolemy.newChain(found.map(f => ptolemy.fromFile(f.getAbsolutePath)) :_*)
+        val chain = ptolemy.newChain(found.map(f => ptolemy.fromFile(f.getAbsolutePath)): _*)
         io.Source.stdin.getLines().map { s: String =>
           Try {
             chain.run(PtolemyJson.parse(s))
           }
         }.foreach {
-            case Success(json) =>
-              config.pretty match {
-                case true  => println(PtolemyJson.pretty(json))
-                case false => println(PtolemyJson.compact(json))
-              }
-              Console.flush()
-            case Failure(e) =>
-              log.error("Unable to process input", e)
-          }
+          case Success(json) =>
+            config.pretty match {
+              case true => println(PtolemyJson.pretty(json))
+              case false => println(PtolemyJson.compact(json))
+            }
+            Console.flush()
+          case Failure(e) =>
+            log.error("Unable to process input", e)
+        }
     }
   }
 }

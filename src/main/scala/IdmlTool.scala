@@ -1,9 +1,13 @@
 import java.io.File
 
 import com.datasift.ptolemy.{PtolemyJson, Ptolemy}
+import org.slf4j.LoggerFactory
+
+import scala.util.{Failure, Success, Try}
 
 object IdmlTool {
   val ptolemy = new Ptolemy()
+  val log = LoggerFactory.getLogger("idml-tool")
 
   val parser = new scopt.OptionParser[IdmlToolConfig]("idml") {
     head("Ptolemy IDML command line tool.")
@@ -34,14 +38,19 @@ object IdmlTool {
       case true =>
         val chain = ptolemy.newChain(found.map(f => ptolemy.fromFile(f.getAbsolutePath)) :_*)
         io.Source.stdin.getLines().map { s: String =>
-          chain.run(PtolemyJson.parse(s))
-        }.foreach { r =>
-          config.pretty match {
-            case true  => println(PtolemyJson.pretty(r))
-            case false => println(PtolemyJson.compact(r))
+          Try {
+            chain.run(PtolemyJson.parse(s))
           }
-          Console.flush()
-        }
+        }.foreach {
+            case Success(json) =>
+              config.pretty match {
+                case true  => println(PtolemyJson.pretty(json))
+                case false => println(PtolemyJson.compact(json))
+              }
+              Console.flush()
+            case Failure(e) =>
+              log.error("Unable to process input", e)
+          }
     }
   }
 }

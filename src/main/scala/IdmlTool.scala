@@ -37,7 +37,7 @@ object IdmlTool {
         sys.exit(1)
       case true =>
         val chain = ptolemy.newChain(found.map(f => ptolemy.fromFile(f.getAbsolutePath)): _*)
-        io.Source.stdin.getLines().map { s: String =>
+        io.Source.stdin.getLines().filter(!_.isEmpty).map { s: String =>
           Try {
             chain.run(PtolemyJson.parse(s))
           }
